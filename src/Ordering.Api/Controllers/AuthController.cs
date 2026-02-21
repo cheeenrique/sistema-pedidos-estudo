@@ -19,6 +19,7 @@ namespace Ordering.Api.Controllers;
 public sealed class AuthController : ControllerBase
 {
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly RoleManager<IdentityRole> _roleManager;
     private readonly JwtOptions _jwtOptions;
     private readonly ITokenService _tokenService;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
@@ -26,12 +27,14 @@ public sealed class AuthController : ControllerBase
 
     public AuthController(
         UserManager<IdentityUser> userManager,
+        RoleManager<IdentityRole> roleManager,
         IOptions<JwtOptions> jwtOptions,
         ITokenService tokenService,
         IRefreshTokenRepository refreshTokenRepository,
         IUnitOfWork unitOfWork)
     {
         _userManager = userManager;
+        _roleManager = roleManager;
         _jwtOptions = jwtOptions.Value;
         _tokenService = tokenService;
         _refreshTokenRepository = refreshTokenRepository;
@@ -91,7 +94,41 @@ public sealed class AuthController : ControllerBase
                 errors));
         }
 
-        await _userManager.AddToRoleAsync(user, "viewer");
+        foreach (var role in new[] { "viewer", "sales" })
+        {
+            if (!await _roleManager.RoleExistsAsync(role))
+            {
+                var roleCreateResult = await _roleManager.CreateAsync(new IdentityRole(role));
+                if (!roleCreateResult.Succeeded)
+                {
+                    var roleErrors = roleCreateResult.Errors
+                        .GroupBy(error => error.Code, StringComparer.OrdinalIgnoreCase)
+                        .ToDictionary(group => group.Key, group => group.Select(error => error.Description).ToArray());
+
+                    return BadRequest(ApiResponseFactory.Error(
+                        "ValidationError",
+                        "One or more validation errors occurred.",
+                        StatusCodes.Status400BadRequest,
+                        HttpContext.TraceIdentifier,
+                        roleErrors));
+                }
+            }
+        }
+
+        var addRolesResult = await _userManager.AddToRolesAsync(user, ["viewer", "sales"]);
+        if (!addRolesResult.Succeeded)
+        {
+            var roleAssignmentErrors = addRolesResult.Errors
+                .GroupBy(error => error.Code, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(group => group.Key, group => group.Select(error => error.Description).ToArray());
+
+            return BadRequest(ApiResponseFactory.Error(
+                "ValidationError",
+                "One or more validation errors occurred.",
+                StatusCodes.Status400BadRequest,
+                HttpContext.TraceIdentifier,
+                roleAssignmentErrors));
+        }
 
         var response = new RegisterResponse(user.Id, user.UserName ?? request.Username, user.Email ?? request.Email);
         return CreatedAtAction(nameof(Register), ApiResponseFactory.Success(response, HttpContext.TraceIdentifier, "User registered successfully."));
@@ -131,7 +168,9 @@ public sealed class AuthController : ControllerBase
         var refreshTokenRecord = RefreshToken.Create(
             user.Id,
             refreshTokenHash,
-            DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenDays));
+            DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenDays),
+            GetClientIp(),
+            GetUserAgent());
 
         await _refreshTokenRepository.AddAsync(refreshTokenRecord, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -169,9 +208,14 @@ public sealed class AuthController : ControllerBase
         var newRefreshToken = _tokenService.GenerateRefreshToken();
         var newRefreshTokenHash = _tokenService.HashToken(newRefreshToken);
 
-        existingToken.Revoke(newRefreshTokenHash);
+        existingToken.Revoke(newRefreshTokenHash, GetClientIp(), GetUserAgent());
         await _refreshTokenRepository.AddAsync(
-            RefreshToken.Create(user.Id, newRefreshTokenHash, DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenDays)),
+            RefreshToken.Create(
+                user.Id,
+                newRefreshTokenHash,
+                DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenDays),
+                GetClientIp(),
+                GetUserAgent()),
             cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -213,9 +257,19 @@ public sealed class AuthController : ControllerBase
             return Unauthorized(ApiResponseFactory.Error("Unauthorized", "No active refresh token found to revoke.", 401, HttpContext.TraceIdentifier));
         }
 
-        tokenRecord.Revoke();
+        tokenRecord.Revoke(revokedByIp: GetClientIp(), revokedByUserAgent: GetUserAgent());
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Ok(ApiResponseFactory.Success(new { revoked = true }, HttpContext.TraceIdentifier, "Refresh token revoked successfully."));
+    }
+
+    private string? GetClientIp()
+    {
+        return HttpContext.Connection.RemoteIpAddress?.ToString();
+    }
+
+    private string? GetUserAgent()
+    {
+        return HttpContext.Request.Headers.UserAgent.ToString();
     }
 }

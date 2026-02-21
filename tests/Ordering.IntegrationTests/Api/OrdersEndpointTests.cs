@@ -1,6 +1,7 @@
 using System.Net;
 using FluentAssertions;
 using Ordering.IntegrationTests.Infrastructure;
+using Xunit;
 
 namespace Ordering.IntegrationTests.Api;
 

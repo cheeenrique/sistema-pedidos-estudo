@@ -87,7 +87,19 @@ public sealed class CustomersController : ControllerBase
             return BadRequest(ApiResponseFactory.Error("ValidationError", "One or more validation errors occurred.", 400, HttpContext.TraceIdentifier, errors));
         }
 
-        var command = new CreateCustomerCommand(request.FullName, request.Email);
+        var command = new CreateCustomerCommand(
+            request.FullName,
+            request.Email,
+            request.DocumentNumber,
+            request.PhoneNumber,
+            request.CustomerType,
+            request.BirthDate,
+            request.Street,
+            request.City,
+            request.State,
+            request.PostalCode,
+            request.Country,
+            request.Notes);
         var result = await _sender.Send(command, cancellationToken);
 
         return CreatedAtAction(nameof(GetById), new { customerId = result.CustomerId }, ApiResponseFactory.Success(result, HttpContext.TraceIdentifier, "Customer created successfully."));

@@ -25,6 +25,7 @@ builder.Host.UseSerilog((context, loggerConfiguration) =>
 });
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.SectionName));
+builder.Services.Configure<DatabaseStartupOptions>(builder.Configuration.GetSection(DatabaseStartupOptions.SectionName));
 builder.Services.AddSingleton<ITokenService, JwtTokenService>();
 builder.Services.AddHostedService<DatabaseInitializationHostedService>();
 builder.Services.AddHostedService<IdentitySeedHostedService>();

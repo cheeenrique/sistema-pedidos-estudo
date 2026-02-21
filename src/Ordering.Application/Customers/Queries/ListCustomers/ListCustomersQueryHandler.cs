@@ -32,6 +32,11 @@ public sealed class ListCustomersQueryHandler : IRequestHandler<ListCustomersQue
                 customer.Id,
                 customer.FullName,
                 customer.Email,
+                customer.DocumentNumber,
+                customer.PhoneNumber,
+                customer.CustomerType,
+                customer.City,
+                customer.State,
                 customer.IsActive,
                 customer.CreatedAtUtc))
             .ToList();

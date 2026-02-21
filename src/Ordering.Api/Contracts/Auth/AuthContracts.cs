@@ -2,14 +2,26 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Ordering.Api.Contracts.Auth;
 
-public sealed record LoginRequest(
-    [property: Required] string Username,
-    [property: Required] string Password);
+public sealed class LoginRequest
+{
+    [Required]
+    public string Username { get; init; } = string.Empty;
 
-public sealed record RegisterRequest(
-    [property: Required] string Username,
-    [property: Required, EmailAddress] string Email,
-    [property: Required] string Password);
+    [Required]
+    public string Password { get; init; } = string.Empty;
+}
+
+public sealed class RegisterRequest
+{
+    [Required]
+    public string Username { get; init; } = string.Empty;
+
+    [Required, EmailAddress]
+    public string Email { get; init; } = string.Empty;
+
+    [Required]
+    public string Password { get; init; } = string.Empty;
+}
 
 public sealed record LoginResponse(
     string AccessToken,
@@ -22,6 +34,13 @@ public sealed record RegisterResponse(
     string Username,
     string Email);
 
-public sealed record RefreshTokenRequest([property: Required] string RefreshToken);
+public sealed class RefreshTokenRequest
+{
+    [Required]
+    public string RefreshToken { get; init; } = string.Empty;
+}
 
-public sealed record RevokeTokenRequest(string? RefreshToken);
+public sealed class RevokeTokenRequest
+{
+    public string? RefreshToken { get; init; }
+}

@@ -149,6 +149,48 @@ Protected endpoint. Returns paginated customer list.
 
 Protected endpoint. Creates a customer.
 
+#### Request body
+
+```json
+{
+  "fullName": "Carlos Henrique",
+  "email": "carlos@example.com",
+  "documentNumber": "12345678901",
+  "phoneNumber": "+55 11 99999-8888",
+  "customerType": "individual",
+  "birthDate": "1990-08-10",
+  "street": "Av. Paulista, 1000",
+  "city": "Sao Paulo",
+  "state": "SP",
+  "postalCode": "01310-100",
+  "country": "Brazil",
+  "notes": "Prefers WhatsApp contact."
+}
+```
+
+#### Success response (`201 Created`)
+
+```json
+{
+  "success": true,
+  "message": "Customer created successfully.",
+  "data": {
+    "customerId": "00000000-0000-0000-0000-000000000001",
+    "fullName": "Carlos Henrique",
+    "email": "carlos@example.com",
+    "documentNumber": "12345678901",
+    "phoneNumber": "+55 11 99999-8888",
+    "customerType": "individual",
+    "birthDate": "1990-08-10T00:00:00Z",
+    "city": "Sao Paulo",
+    "state": "SP",
+    "country": "Brazil",
+    "isActive": true
+  },
+  "traceId": "00-f7b7024db3f7f04f9f4d2f3e4e5a0db5-6b8f2417d9399999-00"
+}
+```
+
 ### `GET /api/customers/{customerId}`
 
 Protected endpoint. Returns customer details.

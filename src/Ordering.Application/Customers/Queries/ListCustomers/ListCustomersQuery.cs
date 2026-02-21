@@ -14,5 +14,10 @@ public sealed record CustomerListItemResponse(
     Guid CustomerId,
     string FullName,
     string Email,
+    string DocumentNumber,
+    string PhoneNumber,
+    string? CustomerType,
+    string? City,
+    string? State,
     bool IsActive,
     DateTime CreatedAtUtc);

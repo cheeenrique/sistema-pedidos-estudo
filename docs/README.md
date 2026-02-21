@@ -11,6 +11,7 @@ This folder centralizes the project knowledge to keep implementation aligned and
 - `conventions.md`: naming, code style, and testing conventions.
 - `migrations.md`: EF Core migration workflow and team conventions.
 - `docker.md`: Docker services, hot reload, and container commands.
+- `customers.md`: customer registration fields and business guidance.
 
 ## How to use
 

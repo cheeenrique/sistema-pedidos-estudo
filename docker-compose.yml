@@ -36,10 +36,11 @@ services:
       Jwt__SigningKey: ${JWT_SIGNING_KEY}
       Jwt__AccessTokenMinutes: ${JWT_ACCESS_TOKEN_MINUTES}
       Jwt__RefreshTokenDays: ${JWT_REFRESH_TOKEN_DAYS}
+      Database__RunMigrationsOnStartup: ${DATABASE_RUN_MIGRATIONS_ON_STARTUP}
     volumes:
       - ./:/src
       - ordering-nuget-cache:/root/.nuget/packages
-    command: ["bash", "/src/docker/dev-entrypoint.sh"]
+    command: ["sh", "-c", "sed 's/\r$//' /src/docker/dev-entrypoint.sh | sh"]
     ports:
       - "${API_DEV_PORT}:8080"
 
@@ -60,6 +61,7 @@ services:
       Jwt__SigningKey: ${JWT_SIGNING_KEY}
       Jwt__AccessTokenMinutes: ${JWT_ACCESS_TOKEN_MINUTES}
       Jwt__RefreshTokenDays: ${JWT_REFRESH_TOKEN_DAYS}
+      Database__RunMigrationsOnStartup: ${DATABASE_RUN_MIGRATIONS_ON_STARTUP}
     ports:
       - "${API_PROD_PORT}:8080"
     profiles:

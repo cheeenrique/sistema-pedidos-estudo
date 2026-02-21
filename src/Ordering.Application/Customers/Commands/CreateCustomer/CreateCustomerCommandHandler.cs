@@ -17,11 +17,34 @@ public sealed class CreateCustomerCommandHandler : IRequestHandler<CreateCustome
 
     public async Task<CreateCustomerResponse> Handle(CreateCustomerCommand request, CancellationToken cancellationToken)
     {
-        var customer = Customer.Create(request.FullName, request.Email);
+        var customer = Customer.Create(
+            request.FullName,
+            request.Email,
+            request.DocumentNumber,
+            request.PhoneNumber,
+            request.CustomerType,
+            request.BirthDate,
+            request.Street,
+            request.City,
+            request.State,
+            request.PostalCode,
+            request.Country,
+            request.Notes);
 
         await _customerRepository.AddAsync(customer, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new CreateCustomerResponse(customer.Id, customer.FullName, customer.Email, customer.IsActive);
+        return new CreateCustomerResponse(
+            customer.Id,
+            customer.FullName,
+            customer.Email,
+            customer.DocumentNumber,
+            customer.PhoneNumber,
+            customer.CustomerType,
+            customer.BirthDate,
+            customer.City,
+            customer.State,
+            customer.Country,
+            customer.IsActive);
     }
 }

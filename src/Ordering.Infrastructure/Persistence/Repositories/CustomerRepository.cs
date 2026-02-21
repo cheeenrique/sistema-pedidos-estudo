@@ -39,7 +39,9 @@ public sealed class CustomerRepository : ICustomerRepository
             var normalizedSearch = search.Trim().ToLowerInvariant();
             query = query.Where(customer =>
                 customer.FullName.ToLower().Contains(normalizedSearch) ||
-                customer.Email.ToLower().Contains(normalizedSearch));
+                customer.Email.ToLower().Contains(normalizedSearch) ||
+                customer.DocumentNumber.ToLower().Contains(normalizedSearch) ||
+                customer.PhoneNumber.ToLower().Contains(normalizedSearch));
         }
 
         var isDescending = sortDirection == CustomerSortDirection.Desc;

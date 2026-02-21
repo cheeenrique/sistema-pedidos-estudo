@@ -33,6 +33,8 @@ API endpoints:
 
 No manual image rebuild is required for code-only changes.
 
+When `DATABASE_RUN_MIGRATIONS_ON_STARTUP=true`, API automatically applies pending EF migrations on startup.
+
 ## Environment variables
 
 Project-level variables are centralized in `.env`.

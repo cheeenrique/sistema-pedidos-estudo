@@ -23,9 +23,9 @@ public sealed class JwtTokenService : ITokenService
 
         var claims = new List<Claim>
         {
-            new(JwtRegisteredClaimNames.Sub, userId),
-            new(JwtRegisteredClaimNames.UniqueName, username),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N"))
+            new(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub, userId),
+            new(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.UniqueName, username),
+            new(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N"))
         };
 
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));

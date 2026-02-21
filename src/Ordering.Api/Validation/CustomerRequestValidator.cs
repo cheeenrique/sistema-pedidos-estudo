@@ -19,6 +19,30 @@ public static class CustomerRequestValidator
             errors["email"] = ["Email is required."];
         }
 
+        if (string.IsNullOrWhiteSpace(request.DocumentNumber))
+        {
+            errors["documentNumber"] = ["DocumentNumber is required."];
+        }
+
+        if (string.IsNullOrWhiteSpace(request.PhoneNumber))
+        {
+            errors["phoneNumber"] = ["PhoneNumber is required."];
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.CustomerType))
+        {
+            var normalizedType = request.CustomerType.Trim().ToLowerInvariant();
+            if (normalizedType is not ("individual" or "company"))
+            {
+                errors["customerType"] = ["Allowed values: individual, company."];
+            }
+        }
+
+        if (request.BirthDate.HasValue && request.BirthDate.Value.Date > DateTime.UtcNow.Date)
+        {
+            errors["birthDate"] = ["BirthDate cannot be in the future."];
+        }
+
         return errors;
     }
 

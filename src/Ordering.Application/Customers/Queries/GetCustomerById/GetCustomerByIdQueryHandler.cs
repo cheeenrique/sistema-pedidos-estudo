@@ -24,6 +24,16 @@ public sealed class GetCustomerByIdQueryHandler : IRequestHandler<GetCustomerByI
             customer.Id,
             customer.FullName,
             customer.Email,
+            customer.DocumentNumber,
+            customer.PhoneNumber,
+            customer.CustomerType,
+            customer.BirthDate,
+            customer.Street,
+            customer.City,
+            customer.State,
+            customer.PostalCode,
+            customer.Country,
+            customer.Notes,
             customer.IsActive,
             customer.CreatedAtUtc);
     }

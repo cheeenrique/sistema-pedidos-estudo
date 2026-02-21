@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
 using Ordering.IntegrationTests.Infrastructure;
+using Xunit;
 
 namespace Ordering.IntegrationTests.Api;
 
@@ -17,10 +18,22 @@ public sealed class AuthEndpointsTests : IClassFixture<CustomWebApplicationFacto
     [Fact]
     public async Task Login_ShouldReturnAccessAndRefreshToken_WhenCredentialsAreValid()
     {
+        var uniqueSuffix = Guid.NewGuid().ToString("N")[..8];
+        var username = $"auth-user-{uniqueSuffix}";
+        var password = "StrongPass123";
+
+        var registerResponse = await _httpClient.PostAsJsonAsync("/api/auth/register", new
+        {
+            username,
+            email = $"{username}@ordering.local",
+            password
+        });
+        registerResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+
         var request = new
         {
-            username = "admin",
-            password = "Admin123!"
+            username,
+            password
         };
 
         var response = await _httpClient.PostAsJsonAsync("/api/auth/login", request);
@@ -48,7 +61,3 @@ public sealed class AuthEndpointsTests : IClassFixture<CustomWebApplicationFacto
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 }
-
-public sealed record ApiSuccessResponse<T>(bool Success, string Message, T Data, string TraceId);
-
-public sealed record AuthTokensResponse(string AccessToken, string RefreshToken, string TokenType, int ExpiresInSeconds);
