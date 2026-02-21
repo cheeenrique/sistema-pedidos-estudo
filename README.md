@@ -1,108 +1,179 @@
-# Ordering System - Professional Backend (.NET 8)
+# Sistema de Pedidos — Backend Profissional (.NET 8)
 
-Learning-first and production-ready backend foundation with C#, ASP.NET Core, and clean architecture.
+Backend para gestão de pedidos, clientes, produtos e autenticação, desenvolvido em C# e ASP.NET Core com Clean Architecture e DDD.
 
-## Learning goals
+## Sobre o projeto
 
-- Apply Clean Architecture with tactical DDD.
-- Use CQRS with MediatR for use case orchestration.
-- Evolve security with JWT and refresh tokens.
-- Implement observability, tests, and performance techniques.
+Sistema de pedidos com API REST que oferece:
 
-## Structure
+- **Autenticação**: registro, login, refresh token e revogação de tokens
+- **Clientes**: CRUD com paginação e ordenação
+- **Produtos**: catálogo com paginação e filtros
+- **Pedidos**: criação, listagem, detalhes e cancelamento
 
-- `src/Ordering.Domain`: pure business rules.
-- `src/Ordering.Application`: use cases and contracts.
-- `src/Ordering.Infrastructure`: persistence and technical integrations.
-- `src/Ordering.Api`: HTTP layer (controllers, middleware, DI).
-- `tests/Ordering.UnitTests`: unit tests.
-- `tests/Ordering.IntegrationTests`: integration tests.
-- `.cursor/rules`: persistent agent rules.
-- `.cursor/skills`: reusable project skills.
+O projeto segue padrões de Clean Architecture, DDD tático e CQRS com MediatR, buscando código organizado, testável e manutenível.
 
-## Current status
+## Arquitetura
 
-- Clean Architecture + DDD tactical patterns + CQRS with MediatR.
-- APIs implemented: `auth`, `orders`, `customers`, `products`.
-- Standard response envelope for success and errors.
-- JWT authentication + ASP.NET Identity + role-based policies.
-- Refresh token flow with rotation and revocation.
-- Docker setup for dev hot reload and production-like runtime.
+```
+src/
+├── Ordering.Domain/      # Regras de negócio puras (entidades, agregados)
+├── Ordering.Application/  # Casos de uso, contratos e CQRS (MediatR)
+├── Ordering.Infrastructure/  # Persistência (EF Core + PostgreSQL) e integrações
+└── Ordering.Api/         # Camada HTTP (controllers, middleware, DI)
 
-## Implementation roadmap
+tests/
+├── Ordering.UnitTests/       # Testes unitários
+└── Ordering.IntegrationTests/  # Testes de integração
+```
 
-1. Domain model and core order use cases.
-2. EF Core + PostgreSQL + migrations.
-3. JWT + Identity + policy-based authorization.
-4. Caching (Memory/Redis), rate limiting, and background services.
-5. Unit, integration, and architecture tests.
+- **Domain**: sem dependências externas; contém entidades e regras de negócio
+- **Application**: orquestra casos de uso via CQRS e depende apenas do Domain
+- **Infrastructure**: implementa repositórios e acesso a dados
+- **Api**: expõe endpoints HTTP e configura o pipeline de requisições
 
-## Local prerequisite
+## Tecnologias
 
-Install .NET 8 SDK:
+- **.NET 8** — ASP.NET Core Web API
+- **Entity Framework Core** — ORM com PostgreSQL
+- **MediatR** — CQRS
+- **ASP.NET Identity** — autenticação e roles
+- **JWT** — tokens de acesso e refresh
+- **Serilog** — logging estruturado
+- **Docker** — ambiente de desenvolvimento e produção
 
-- Windows (winget): `winget install Microsoft.DotNet.SDK.8`
-- Verify: `dotnet --version`
+## Pré-requisitos
 
-## Commands when SDK is available
+- **.NET 8 SDK** — [Download](https://dotnet.microsoft.com/download/dotnet/8.0)
+- **Docker** (opcional) — para rodar via Docker Compose
+- **PostgreSQL** — para executar localmente sem Docker
 
-Restore:
+### Verificar instalação do .NET
 
-`dotnet restore`
+```bash
+dotnet --version
+```
 
-Build:
+## Como rodar
 
-`dotnet build`
+### Opção 1: Docker (recomendado)
 
-Run API:
-
-`dotnet run --project src/Ordering.Api`
-
-## Docker commands
-
-### First setup
+1. **Configurar variáveis de ambiente**
 
 ```powershell
 copy .env.example .env
 ```
 
-### Development mode (hot reload)
+2. **Modo desenvolvimento (hot reload)**
 
 ```powershell
 docker compose up --build db api-dev
 ```
 
-- API: `http://localhost:8080`
-- Swagger: `http://localhost:8080/swagger`
+- API: http://localhost:8080  
+- Swagger: http://localhost:8080/swagger  
+- Health check: http://localhost:8080/health  
 
-### Production-like mode
+3. **Modo produção**
 
 ```powershell
 docker compose --profile prod up --build db api
 ```
 
-- API: `http://localhost:8081`
+- API: http://localhost:8081  
 
-### Useful Docker commands
+### Opção 2: Local (sem Docker)
 
-```powershell
-# Build API image only
-docker compose build api
+1. **Subir PostgreSQL** (ex.: porta 5432, usuário `postgres`, senha `postgres`, banco `ordering_db`)
 
-# Follow dev API logs
-docker compose logs -f api-dev
+2. **Configurar connection string** em `src/Ordering.Api/appsettings.json`:
 
-# Stop containers
-docker compose down
-
-# Stop and remove volumes (database reset)
-docker compose down -v
-
-# Run migration command inside dev container
-docker compose exec api-dev dotnet ef migrations add MigrationName --project src/Ordering.Infrastructure --startup-project src/Ordering.Api
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Host=localhost;Port=5432;Database=ordering_db;Username=postgres;Password=postgres"
+}
 ```
 
-## Database startup behavior
+3. **Executar**
 
-- Docker uses `.env` with `DATABASE_RUN_MIGRATIONS_ON_STARTUP=true`.
-- On API startup, pending EF migrations are automatically applied.
+```powershell
+# Restaurar dependências
+dotnet restore
+
+# Compilar
+dotnet build
+
+# Rodar API
+dotnet run --project src/Ordering.Api
+```
+
+4. API em http://localhost:5000 (ou porta conforme configurado)
+
+## Comandos úteis
+
+### Docker
+
+```powershell
+# Build apenas da API
+docker compose build api
+
+# Ver logs em tempo real
+docker compose logs -f api-dev
+
+# Parar containers
+docker compose down
+
+# Parar e remover volumes (reset do banco)
+docker compose down -v
+
+# Criar nova migration
+docker compose exec api-dev dotnet ef migrations add NomeDaMigration --project src/Ordering.Infrastructure --startup-project src/Ordering.Api
+```
+
+### Testes
+
+```powershell
+# Testes unitários
+dotnet test tests/Ordering.UnitTests
+
+# Testes de integração
+dotnet test tests/Ordering.IntegrationTests
+```
+
+## Endpoints principais
+
+| Endpoint | Método | Descrição |
+|----------|--------|-----------|
+| `/api/auth/register` | POST | Registrar usuário |
+| `/api/auth/login` | POST | Login (retorna access + refresh token) |
+| `/api/auth/refresh` | POST | Renovar tokens |
+| `/api/auth/revoke` | POST | Revogar refresh token |
+| `/api/customers` | GET, POST | Listar, criar clientes |
+| `/api/customers/{id}` | GET | Detalhes do cliente |
+| `/api/products` | GET, POST | Listar, criar produtos |
+| `/api/products/{id}` | GET | Detalhes do produto |
+| `/api/orders` | GET, POST | Listar, criar pedidos |
+| `/api/orders/{id}` | GET | Detalhes do pedido |
+| `/api/orders/{id}/cancel` | POST | Cancelar pedido |
+| `/health` | GET | Health check |
+
+## Variáveis de ambiente
+
+| Variável | Descrição |
+|----------|-----------|
+| `CONNECTION_STRING` | Connection string do PostgreSQL |
+| `JWT_SIGNING_KEY` | Chave secreta para JWT (mín. 32 caracteres) |
+| `JWT_ISSUER` | Emissor do token |
+| `JWT_AUDIENCE` | Audiência do token |
+| `JWT_ACCESS_TOKEN_MINUTES` | Tempo de vida do access token |
+| `JWT_REFRESH_TOKEN_DAYS` | Tempo de vida do refresh token |
+| `DATABASE_RUN_MIGRATIONS_ON_STARTUP` | Executar migrations ao iniciar (true/false) |
+
+## Banco de dados
+
+- Com Docker: migrations são aplicadas automaticamente se `DATABASE_RUN_MIGRATIONS_ON_STARTUP=true` no `.env`
+- O banco é criado e atualizado automaticamente na inicialização da API
+
+## Licença
+
+Uso pessoal/educacional.

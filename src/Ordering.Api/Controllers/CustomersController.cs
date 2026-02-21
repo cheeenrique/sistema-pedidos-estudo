@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,7 @@ namespace Ordering.Api.Controllers;
 /// Handles customer operations including pagination, creation, and details retrieval.
 /// </summary>
 [ApiController]
+[ApiVersion("1.0")]
 [Authorize]
 [Route("api/customers")]
 [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status401Unauthorized)]

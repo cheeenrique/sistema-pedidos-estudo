@@ -26,11 +26,9 @@ public sealed class CreateCustomerRequest
     public string? Notes { get; init; }
 }
 
-public sealed class ListCustomersRequest
-{
-    public int Page { get; init; } = 1;
-    public int PageSize { get; init; } = 10;
-    public string? Search { get; init; }
-    public string? SortBy { get; init; }
-    public string? SortDirection { get; init; }
-}
+public sealed record ListCustomersRequest(
+    int Page = 1,
+    int PageSize = 10,
+    string? Search = null,
+    string? SortBy = null,
+    string? SortDirection = null);

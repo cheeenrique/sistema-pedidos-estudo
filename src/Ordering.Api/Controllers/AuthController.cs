@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,7 @@ namespace Ordering.Api.Controllers;
 /// Handles identity lifecycle and token operations.
 /// </summary>
 [ApiController]
+[ApiVersion("1.0")]
 [Route("api/auth")]
 public sealed class AuthController : ControllerBase
 {

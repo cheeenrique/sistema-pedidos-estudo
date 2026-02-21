@@ -1,4 +1,6 @@
+using System.Threading.RateLimiting;
 using System.Text;
+using Asp.Versioning;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -102,6 +104,28 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("CustomerWrite", policy => policy.RequireRole("admin", "sales"));
 });
 
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<OrderingDbContext>("database");
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.User.Identity?.Name ?? context.Request.Headers.Host.ToString(),
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 100,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+});
+
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+}).AddApiExplorer(options => options.GroupNameFormat = "'v'VVV");
+
 builder.Services
     .AddControllers()
     .ConfigureApiBehaviorOptions(options =>
@@ -180,8 +204,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapHealthChecks("/health");
 app.MapControllers();
 
 app.Run();

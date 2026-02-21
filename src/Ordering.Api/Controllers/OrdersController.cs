@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +17,7 @@ namespace Ordering.Api.Controllers;
 /// Handles order operations such as listing, creating, reading details, and cancellation.
 /// </summary>
 [ApiController]
+[ApiVersion("1.0")]
 [Authorize]
 [Route("api/orders")]
 [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status401Unauthorized)]

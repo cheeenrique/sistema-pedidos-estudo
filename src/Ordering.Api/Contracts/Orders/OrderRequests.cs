@@ -23,14 +23,12 @@ public sealed class CreateOrderItemDto
     public decimal UnitPrice { get; init; }
 }
 
-public sealed class ListOrdersRequest
-{
-    public int Page { get; init; } = 1;
-    public int PageSize { get; init; } = 10;
-    public string? Status { get; init; }
-    public Guid? CustomerId { get; init; }
-    public DateTime? CreatedFromUtc { get; init; }
-    public DateTime? CreatedToUtc { get; init; }
-    public string? SortBy { get; init; }
-    public string? SortDirection { get; init; }
-}
+public sealed record ListOrdersRequest(
+    int Page = 1,
+    int PageSize = 10,
+    string? Status = null,
+    Guid? CustomerId = null,
+    DateTime? CreatedFromUtc = null,
+    DateTime? CreatedToUtc = null,
+    string? SortBy = null,
+    string? SortDirection = null);

@@ -15,16 +15,17 @@ public static class OrderRequestValidator
             errors["customerId"] = ["CustomerId cannot be empty."];
         }
 
-        if (request.Items.Count == 0)
+        var items = request.Items ?? [];
+        if (items.Count == 0)
         {
             errors["items"] = ["At least one item is required."];
             return errors;
         }
 
         var itemErrors = new List<string>();
-        for (var index = 0; index < request.Items.Count; index++)
+        for (var index = 0; index < items.Count; index++)
         {
-            var item = request.Items.ElementAt(index);
+            var item = items.ElementAt(index);
             if (item.ProductId == Guid.Empty)
             {
                 itemErrors.Add($"items[{index}].productId cannot be empty.");
