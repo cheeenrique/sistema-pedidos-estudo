@@ -1,0 +1,14 @@
+---
+description: DDD tactical patterns and clean architecture boundaries for C# files
+globs: **/*.cs
+alwaysApply: false
+---
+
+# DDD + Clean Architecture
+
+- `Domain` must not reference `Application`, `Infrastructure`, or `Api`.
+- Keep aggregate consistency rules inside aggregate root methods.
+- Use repositories only as abstractions in `Application`; implement them in `Infrastructure`.
+- Organize use cases by feature and action: `Orders/Commands/CreateOrder`, `Orders/Queries/GetOrderById`.
+- Keep controllers thin: map HTTP input to command/query and delegate to MediatR.
+- Avoid anemic domain model: business behavior belongs to entities/value objects, not only handlers.

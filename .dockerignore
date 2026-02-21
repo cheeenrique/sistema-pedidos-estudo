@@ -1,0 +1,12 @@
+.git
+.vs
+.vscode
+bin
+obj
+**/bin
+**/obj
+node_modules
+terminals
+agent-transcripts
+mcps
+artifacts

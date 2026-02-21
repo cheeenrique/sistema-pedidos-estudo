@@ -1,0 +1,13 @@
+---
+description: Unit and integration testing standards for .NET backend
+globs: tests/**/*.cs
+alwaysApply: false
+---
+
+# Testing Standards
+
+- Use Arrange-Act-Assert with clear test names: `Method_ShouldBehavior_WhenCondition`.
+- Unit tests must isolate domain/application behavior and avoid database dependencies.
+- Integration tests should cover API contract, persistence flow, and critical security behavior.
+- Assert business outcomes, not implementation details.
+- Add regression tests for every bug fix.

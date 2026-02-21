@@ -1,0 +1,14 @@
+---
+description: Core clean code and SOLID standards for all project work
+alwaysApply: true
+---
+
+# Core Engineering Standards
+
+- Use clear names in English for classes, methods, variables, and files.
+- Keep methods small and focused on a single reason to change.
+- Depend on abstractions from `Application` or `Domain`, not concrete infrastructure details.
+- Prefer immutable request/response contracts with `record` for API and CQRS boundaries.
+- Validate input at boundaries and enforce business invariants inside domain entities.
+- Use explicit error handling with meaningful messages; do not swallow exceptions.
+- Avoid comments that restate obvious code; add comments only for non-trivial decisions.

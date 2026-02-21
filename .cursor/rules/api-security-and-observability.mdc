@@ -1,0 +1,14 @@
+---
+description: API-level security, observability, and production readiness checks
+globs: src/Ordering.Api/**/*.cs
+alwaysApply: false
+---
+
+# API Security and Observability
+
+- Use API versioning strategy before exposing external endpoints.
+- Protect sensitive routes with authorization policies, not role checks in controller methods.
+- Keep JWT validation in middleware/auth pipeline and avoid custom token parsing in handlers.
+- Log with structured context (`OrderId`, `CustomerId`, `CorrelationId`) and avoid logging secrets.
+- Return consistent error payloads and HTTP status codes.
+- Add health checks and rate limiting for internet-facing APIs.

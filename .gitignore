@@ -1,0 +1,10 @@
+# Build
+bin/
+obj/
+**/bin/
+**/obj/
+
+# User/local
+.env
+.vs/
+.vscode/
